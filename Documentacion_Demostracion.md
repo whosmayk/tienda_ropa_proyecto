@@ -204,9 +204,6 @@
 
 ## 8. Notas Importantes
 
-### Cómo actualizar los archivos en el servidor
-Los archivos están en: **D:\ITA 2026\Taller de DB\P_Tienda_Ropa\CRUD Tienda Ropa\tienda_ropa_test\**
-
 Para que funcionen en el servidor local, copia todos los archivos a:
 **C:\xampp\htdocs\tienda_ropa_test\**
 
