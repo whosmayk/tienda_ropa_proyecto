@@ -8,9 +8,12 @@ $PuedeGestionar = $es_admin || $es_empleado;
 <link href="styles.css" rel="stylesheet">
 <style>
     body { margin-bottom: 30px; }
-    .table thead { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; }
+    .table thead th { 
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; 
+        color: white !important;
+    }
 </style>
-<nav class="navbar navbar-expand-lg navbar-dark mb-4 navbar-custom">
+<nav class="navbar navbar-expand-lg navbar-dark mb-4 navbar-custom sticky-top">
     <div class="container">
         <a class="navbar-brand" href="<?= $usuario_logueado ? 'index.php' : 'login.php' ?>">👕 TiendaRopa</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">

@@ -38,7 +38,7 @@ function getHeaderLink($col_key, $label, $current_sort, $current_order, $current
         $url .= "&search=" . urlencode($current_search);
     }
     
-    return "<a href='{$url}' class='text-white text-decoration-none d-block'>{$label}{$icon}</a>";
+    return "<a href='{$url}' class='text-white text-decoration-none d-block fw-bold'>{$label}{$icon}</a>";
 }
 ?>
 
@@ -82,7 +82,7 @@ function getHeaderLink($col_key, $label, $current_sort, $current_order, $current
         <div class="card card-custom">
             <div class="table-responsive">
             <table class="table table-hover mb-0">
-                <thead class="table-dark">
+                <thead>
                     <tr>
                         <th><?= getHeaderLink('id', 'ID', $sort, $order, $search) ?></th>
                         <th><?= getHeaderLink('nombre', 'Nombre', $sort, $order, $search) ?></th>

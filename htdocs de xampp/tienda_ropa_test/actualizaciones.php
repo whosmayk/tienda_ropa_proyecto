@@ -67,7 +67,7 @@ if(isset($_POST['actualizar_precio'])){
         <?php endif; ?>
         <div class="card card-custom">
             <table class="table table-hover mb-0">
-                <thead class="table-dark">
+                <thead>
                     <tr><th>Fecha</th><th>Prenda</th><th>Precio Anterior</th><th>Precio Nuevo</th><th>Empleado</th></tr>
                 </thead>
                 <tbody>

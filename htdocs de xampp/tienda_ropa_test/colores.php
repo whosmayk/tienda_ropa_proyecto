@@ -77,7 +77,7 @@ if(isset($_POST['delete'])){
             <div class="col-md-<?= puede_gestionar_catalogo() ? '8' : '12' ?> mb-4">
                 <div class="card card-custom">
                     <table class="table table-hover mb-0">
-                        <thead class="table-dark">
+                        <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Nombre del Color</th>

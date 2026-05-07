@@ -11,29 +11,34 @@ include 'db.php';
 
 // 1. Lógica para INSERTAR (Nuevo Empleado)
 if(isset($_POST['add'])){
-    $conn->query("SET @usuario_app = '".$_SESSION['usuario']."'");
+    $stmtUser = $conn->prepare("SET @usuario_app = ?");
+    $stmtUser->execute([$_SESSION['usuario']]);
     $stmt = $conn->prepare("INSERT INTO empleado (nombre, puesto) VALUES (?, ?)");
     $stmt->execute([$_POST['nombre'], $_POST['puesto']]);
     header("Location: empleados.php?msg=creado");
+    exit;
 }
 
 // 2. Lógica para ACTUALIZAR (Modificar Empleado existente)
 if(isset($_POST['update'])){
-    $conn->query("SET @usuario_app = '".$_SESSION['usuario']."'");
+    $stmtUser = $conn->prepare("SET @usuario_app = ?");
+    $stmtUser->execute([$_SESSION['usuario']]);
     $stmt = $conn->prepare("UPDATE empleado SET nombre = ?, puesto = ? WHERE id_empleado = ?");
     $stmt->execute([$_POST['nombre'], $_POST['puesto'], $_POST['id_empleado']]);
     header("Location: empleados.php?msg=actualizado");
+    exit;
 }
 
 // 3. Lógica para ELIMINAR
 if(isset($_GET['delete'])){
     try {
-        $conn->query("SET @usuario_app = '".$_SESSION['usuario']."'");
+        $stmtUser = $conn->prepare("SET @usuario_app = ?");
+        $stmtUser->execute([$_SESSION['usuario']]);
         $stmt = $conn->prepare("DELETE FROM empleado WHERE id_empleado = ?");
         $stmt->execute([$_GET['delete']]);
         header("Location: empleados.php?msg=eliminado");
+        exit;
     } catch (Exception $e) {
-        // Error común: El empleado tiene registros asociados en la tabla 'registro'
         $error = "No se puede eliminar este empleado porque tiene registros de mercancía asociados.";
     }
 }
@@ -49,6 +54,12 @@ if(isset($_GET['delete'])){
     <?php include 'header.php'; ?>
     <div class="container main-container">
         <h2 class="page-title">👥 Empleados</h2>
+        <?php if(isset($error)): ?>
+        <div class="alert alert-danger alert-dismissible fade show">
+            <?= htmlspecialchars($error) ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <?php endif; ?>
         <div class="row">
             <!-- Formulario Lateral para registro rápido -->
             <div class="col-md-4 mb-4">
@@ -77,7 +88,7 @@ if(isset($_GET['delete'])){
             <div class="col-md-8 mb-4">
                 <div class="card card-custom">
                     <table class="table table-hover mb-0">
-                        <thead class="table-dark">
+                        <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Nombre</th>
@@ -90,16 +101,16 @@ if(isset($_GET['delete'])){
                             $res = $conn->query("SELECT * FROM empleado");
                             while($row = $res->fetch()){
                                 echo "<tr>
-                                        <td>{$row['id_empleado']}</td>
-                                        <td>{$row['nombre']}</td>
-                                        <td><span class='badge " . ($row['puesto'] == 'gerente' ? 'bg-danger' : 'bg-info') . "'>{$row['puesto']}</span></td>
+                                        <td>".htmlspecialchars($row['id_empleado'])."</td>
+                                        <td>".htmlspecialchars($row['nombre'])."</td>
+                                        <td><span class='badge " . ($row['puesto'] == 'gerente' ? 'bg-danger' : 'bg-info') . "'>".htmlspecialchars($row['puesto'])."</span></td>
                                         <td class='text-center'>
                                             <div class='btn-group'>
-                                                <button class='btn btn-sm btn-warning' 
-                                                    onclick='abrirEditar({$row['id_empleado']}, \"{$row['nombre']}\", \"{$row['puesto']}\")'>
+<button class='btn btn-sm btn-warning' 
+                                                    onclick='abrirEditar(".htmlspecialchars($row['id_empleado']).", ".json_encode($row['nombre']).", ".json_encode($row['puesto']).")'>
                                                     Editar
                                                 </button>
-                                                <a href='empleados.php?delete={$row['id_empleado']}' 
+                                                <a href='empleados.php?delete=".htmlspecialchars($row['id_empleado'])."'
                                                    class='btn btn-sm btn-danger' 
                                                    onclick='return confirm(\"¿Estás seguro de eliminar este empleado?\")'>
                                                     Eliminar

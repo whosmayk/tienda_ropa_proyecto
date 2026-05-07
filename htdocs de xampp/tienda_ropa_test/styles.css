@@ -157,6 +157,69 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
 }
 
+/* Tablas personalizadas - esquema de colores */
+.table {
+    background: white !important;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    font-weight: 600;
+    padding: 12px 15px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.table thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s;
+}
+
+.table tbody tr:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+}
+
+.table tbody td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    color: #495057;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table-dark thead th {
+    background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+}
+
+.table-dark tbody td {
+    color: white;
+}
+
+.table-dark tbody tr:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Encabezado de tabla en card */
+.card-custom .table thead th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
 /* Contenedor principal */
 .main-container {
     padding-bottom: 40px;

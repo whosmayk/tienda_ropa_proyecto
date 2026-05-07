@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 07-05-2026 a las 05:39:43
+-- Tiempo de generación: 07-05-2026 a las 19:00:25
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -27,17 +27,6 @@ DELIMITER $$
 --
 -- Procedimientos
 --
-DROP PROCEDURE IF EXISTS `actualizar_precio_prenda`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizar_precio_prenda` (IN `p_id_prenda` INT, IN `p_nuevo_precio` DECIMAL(10,2), IN `p_id_empleado` INT, IN `p_usuario` VARCHAR(50))   BEGIN
-    DECLARE v_precio_anterior DECIMAL(10,2);
-    SELECT precio INTO v_precio_anterior FROM prenda WHERE id_prenda = p_id_prenda;
-    UPDATE prenda SET precio = p_nuevo_precio WHERE id_prenda = p_id_prenda;
-    INSERT INTO actualizacion (fecha, precio_anterior, precio_nuevo, id_prenda, id_empleado)
-    VALUES (NOW(), v_precio_anterior, p_nuevo_precio, p_id_prenda, p_id_empleado);
-    INSERT INTO bitacora_sistema (usuario, accion, tabla_afectada)
-    VALUES (p_usuario, CONCAT('Actualizacion de precio id_prenda: ', p_id_prenda, ' de ', v_precio_anterior, ' a ', p_nuevo_precio), 'prenda');
-END$$
-
 DROP PROCEDURE IF EXISTS `sp_categoria_nueva`$$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_categoria_nueva` (IN `p_nombre` VARCHAR(50), IN `p_descripcion` TEXT)   BEGIN
     INSERT INTO categoria (nombre, descripcion) VALUES (p_nombre, p_descripcion);
@@ -95,7 +84,10 @@ INSERT INTO `actualizacion` (`id_actualizacion`, `fecha`, `precio_anterior`, `pr
 (6, '2026-02-18 21:55:06', 1200.00, 1350.00, 3, 1),
 (8, '2026-05-06 21:03:00', 1500.00, 1450.00, 39, 2),
 (9, '2026-05-06 21:05:17', 1450.00, 1475.00, 39, 2),
-(10, '2026-05-06 21:27:59', 1475.00, 1500.00, 39, 2);
+(10, '2026-05-06 21:27:59', 1475.00, 1500.00, 39, 2),
+(11, '2026-05-07 09:30:53', 450.00, 400.00, 1, 1),
+(12, '2026-05-07 10:19:15', 280.00, 250.00, 23, 4),
+(13, '2026-05-07 10:29:38', 500.00, 550.00, 40, 2);
 
 -- --------------------------------------------------------
 
@@ -123,9 +115,11 @@ INSERT INTO `bitacora_sistema` (`id_bitacora`, `usuario`, `accion`, `tabla_afect
 (4, 'user_ventas', 'Registro de movimiento de stock: entrada', 'movimiento_stock', '2026-03-23 22:51:16'),
 (5, 'admin', 'Modificación de categoría: Caballero', 'categoria', '2026-03-23 22:51:16'),
 (6, 'admin_tienda', 'Insercion de nueva prenda: Hoodie Cactus Jack', 'prenda', '2026-05-06 21:02:26'),
-(7, 'root@localhost', 'Actualizacion de precio id_prenda: 39 de 1500.00 a 1450.00', 'prenda', '2026-05-06 21:03:00'),
-(8, 'root@localhost', 'Actualizacion de precio id_prenda: 39 de 1450.00 a 1475.00', 'prenda', '2026-05-06 21:05:17'),
-(9, 'empleado_tienda', 'Actualizacion de precio id_prenda: 39 de 1475.00 a 1500.00', 'prenda', '2026-05-06 21:27:59');
+(9, 'empleado_tienda', 'Actualizacion de precio id_prenda: 39 de 1475.00 a 1500.00', 'prenda', '2026-05-06 21:27:59'),
+(10, 'admin_tienda', 'Actualizacion de precio id_prenda: 1 de 450.00 a 400.00', 'prenda', '2026-05-07 09:30:53'),
+(11, 'admin_tienda', 'Actualizacion de precio id_prenda: 23 de 280.00 a 250.00', 'prenda', '2026-05-07 10:19:15'),
+(12, 'empleado_tienda', 'Insercion de nueva prenda: Pantalón Baggie de Mezclilla', 'prenda', '2026-05-07 10:24:48'),
+(13, 'admin_tienda', 'Actualizacion de precio id_prenda: 40 de 500.00 a 550.00', 'prenda', '2026-05-07 10:29:38');
 
 -- --------------------------------------------------------
 
@@ -195,8 +189,7 @@ INSERT INTO `empleado` (`id_empleado`, `nombre`, `puesto`) VALUES
 (1, 'Karina Sánchez', 'gerente'),
 (2, 'Miguel Esparza', 'empleado'),
 (3, 'Kennia De luna', 'gerente'),
-(4, 'Mariana Juárez', 'gerente'),
-(5, 'Guadalupe Hernández', 'empleado');
+(4, 'Mariana Juárez', 'gerente');
 
 -- --------------------------------------------------------
 
@@ -222,27 +215,38 @@ INSERT INTO `movimiento_stock` (`id_movimiento`, `fecha`, `tipo_movimiento`, `ca
 (1, '2026-02-07 20:24:25', 'entrada', 10, 1, 2),
 (2, '2026-02-07 20:24:25', 'salida', 5, 2, 3),
 (3, '2026-02-07 20:24:25', 'ajuste', -2, 3, 1),
-(4, '2026-02-07 20:24:25', 'entrada', 20, 4, 5),
 (5, '2026-02-07 20:24:25', 'salida', 1, 5, 2),
 (66, '2025-10-20 09:00:00', 'entrada', 10, 21, 2),
 (67, '2025-10-20 14:30:00', 'salida', 2, 22, 3),
 (68, '2025-10-21 08:15:00', 'entrada', 50, 23, 1),
 (70, '2025-10-21 16:45:00', 'ajuste', -1, 25, 4),
 (71, '2025-10-22 10:20:00', 'entrada', 20, 26, 1),
-(72, '2026-01-22 13:10:00', 'salida', 3, 27, 5),
 (73, '2026-01-23 09:45:00', 'entrada', 15, 28, 2),
 (74, '2026-01-23 18:20:00', 'salida', 1, 29, 3),
 (75, '2026-01-24 07:30:00', 'entrada', 30, 30, 4),
 (76, '2026-01-24 15:00:00', 'salida', 10, 31, 2),
 (77, '2026-01-25 11:15:00', 'entrada', 5, 32, 1),
-(78, '2026-01-25 12:00:00', 'salida', 2, 33, 5),
 (79, '2026-01-26 10:00:00', 'entrada', 12, 34, 2),
 (80, '2026-01-26 16:30:00', 'salida', 4, 35, 3),
 (81, '2026-02-18 22:11:01', 'ajuste', 5, 34, 1),
 (82, '2026-02-24 07:26:22', 'entrada', 15, 36, 2),
 (83, '2026-02-24 10:26:42', 'entrada', 10, 38, 2),
 (84, '2026-03-23 23:05:14', 'entrada', 10, 1, 1),
-(85, '2026-05-06 21:29:48', 'entrada', 10, 39, 2);
+(85, '2026-05-06 21:29:48', 'entrada', 10, 39, 2),
+(86, '2026-05-07 00:08:11', 'entrada', 30, 2, 1),
+(87, '2026-05-07 00:08:24', 'entrada', 15, 3, 1),
+(88, '2026-05-07 00:08:39', 'entrada', 15, 5, 1),
+(89, '2026-05-07 00:09:51', 'entrada', 15, 22, 1),
+(90, '2026-05-07 00:10:07', 'entrada', 15, 25, 3),
+(91, '2026-05-07 00:10:46', 'entrada', 15, 27, 3),
+(92, '2026-05-07 00:11:43', 'entrada', 15, 29, 2),
+(93, '2026-05-07 08:09:15', 'entrada', 2, 3, 1),
+(95, '2026-05-07 09:31:46', 'entrada', 2, 22, 1),
+(96, '2026-05-07 10:26:13', 'entrada', 5, 40, 1),
+(97, '2026-05-07 10:35:24', 'entrada', 20, 4, 1),
+(98, '2026-05-07 10:55:41', 'entrada', 20, 31, 1),
+(99, '2026-05-07 10:55:54', 'entrada', 15, 33, 1),
+(100, '2026-05-07 10:56:12', 'entrada', 15, 35, 1);
 
 --
 -- Disparadores `movimiento_stock`
@@ -290,28 +294,29 @@ CREATE TABLE `prenda` (
 --
 
 INSERT INTO `prenda` (`id_prenda`, `nombre`, `precio`, `stock_actual`, `id_categoria`, `id_talla`, `id_color`) VALUES
-(1, 'Camisa Oxford Slim', 450.00, 35, 1, 2, 3),
-(2, 'Pantalón Jean Clásico', 650.50, 40, 1, 3, 1),
-(3, 'Vestido de Gala Rojo', 1350.00, 10, 2, 2, 4),
-(4, 'Playera Deportiva Pro', 350.00, 50, 4, 1, 2),
+(1, 'Camisa Oxford Slim', 400.00, 20, 1, 2, 5),
+(2, 'Pantalón Jean Clásico', 650.50, 25, 1, 3, 1),
+(3, 'Vestido de Gala Rojo', 1350.00, 15, 2, 2, 4),
+(4, 'Playera Deportiva Pro', 350.00, 20, 4, 1, 2),
 (5, 'Sudadera Infantil Hoodie', 400.00, 15, 3, 2, 5),
-(21, 'Blusa Seda Elegante', 550.00, 15, 2, 1, 2),
-(22, 'Chaqueta Cuero Sintético', 1200.00, 8, 1, 3, 1),
-(23, 'Short Deportivo Runner', 280.00, 45, 4, 2, 3),
-(25, 'Jeans Skinny Fit Dama', 750.00, 22, 2, 2, 3),
-(26, 'Playera Básica Cuello V', 190.00, 60, 1, 2, 2),
-(27, 'Vestido Midi Estampado', 890.00, 12, 2, 3, 4),
-(28, 'Sudadera con Capucha Gris', 500.00, 18, 1, 3, 5),
-(29, 'Pijama Térmica Infantil', 350.00, 30, 3, 2, 3),
-(30, 'Gorra Deportiva Ajustable', 250.00, 25, 5, 3, 1),
+(21, 'Blusa Seda Elegante', 550.00, 10, 2, 1, 2),
+(22, 'Chaqueta Cuero Sintético', 1200.00, 15, 1, 3, 1),
+(23, 'Short Deportivo Runner', 250.00, 50, 4, 2, 3),
+(25, 'Jeans Skinny Fit Dama', 750.00, 14, 2, 2, 3),
+(26, 'Playera Básica Cuello V', 190.00, 20, 1, 2, 2),
+(27, 'Vestido Midi Estampado', 890.00, 15, 2, 3, 4),
+(28, 'Sudadera con Capucha Gris', 500.00, 15, 1, 3, 5),
+(29, 'Pijama Térmica Infantil', 350.00, 14, 3, 2, 3),
+(30, 'Gorra Deportiva Ajustable', 250.00, 30, 5, 3, 1),
 (31, 'Suéter Lana Merino', 950.00, 10, 1, 3, 5),
-(32, 'Falda Plisada Coreana', 480.00, 20, 2, 1, 4),
+(32, 'Falda Plisada Coreana', 480.00, 5, 2, 1, 4),
 (33, 'Conjunto Deportivo Yoga', 720.00, 15, 4, 2, 1),
-(34, 'Camiseta Manga Larga', 320.00, 45, 3, 3, 2),
-(35, 'Cinturón Cuero Café', 300.00, 25, 5, 3, 5),
-(36, 'Conjunto Pijama Negra', 250.00, 30, 1, 3, 1),
-(38, 'Conjunto Pijama Negra', 220.00, 20, 1, 8, 1),
-(39, 'Hoodie Cactus Jack', 1500.00, 10, 1, 8, 1);
+(34, 'Camiseta Manga Larga', 320.00, 17, 3, 3, 2),
+(35, 'Cinturón Cuero Café', 300.00, 11, 5, 3, 5),
+(36, 'Conjunto Pijama Negra', 250.00, 15, 1, 3, 1),
+(38, 'Conjunto Pijama Negra', 220.00, 10, 1, 8, 1),
+(39, 'Hoodie Cactus Jack', 1500.00, 10, 1, 8, 1),
+(40, 'Pantalón Baggie de Mezclilla', 550.00, 5, 1, 3, 3);
 
 --
 -- Disparadores `prenda`
@@ -599,13 +604,13 @@ ALTER TABLE `talla`
 -- AUTO_INCREMENT de la tabla `actualizacion`
 --
 ALTER TABLE `actualizacion`
-  MODIFY `id_actualizacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_actualizacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `bitacora_sistema`
 --
 ALTER TABLE `bitacora_sistema`
-  MODIFY `id_bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_bitacora` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `categoria`
@@ -629,13 +634,13 @@ ALTER TABLE `empleado`
 -- AUTO_INCREMENT de la tabla `movimiento_stock`
 --
 ALTER TABLE `movimiento_stock`
-  MODIFY `id_movimiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=86;
+  MODIFY `id_movimiento` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- AUTO_INCREMENT de la tabla `prenda`
 --
 ALTER TABLE `prenda`
-  MODIFY `id_prenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id_prenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedor`

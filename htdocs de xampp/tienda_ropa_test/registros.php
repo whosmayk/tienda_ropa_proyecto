@@ -41,7 +41,7 @@ if(isset($_POST['registrar_recepcion'])){
 
         <div class="card card-custom">
             <table class="table table-hover mb-0">
-                <thead class="table-dark">
+                <thead>
                     <tr>
                         <th>Fecha y Hora</th>
                         <th>Prenda Recibida</th>

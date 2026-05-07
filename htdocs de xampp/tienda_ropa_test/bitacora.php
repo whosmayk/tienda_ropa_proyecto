@@ -16,7 +16,7 @@ include 'db.php';
         
         <div class="card card-custom">
             <table class="table table-hover mb-0">
-                <thead class="table-dark">
+                <thead>
                     <tr>
                         <th>ID</th>
                         <th>Usuario</th>

@@ -6,8 +6,9 @@ include 'db.php';
 // Usando TRANSACCIÓN + SP
 if(isset($_POST['registrar_mov'])){
     try {
-        // Establecer variable de usuario para el trigger
-        $conn->query("SET @usuario_app = '".$_SESSION['usuario']."'");
+        // Establecer variable de usuario para el trigger (usando prepared statement)
+        $stmtUser = $conn->prepare("SET @usuario_app = ?");
+        $stmtUser->execute([$_SESSION['usuario']]);
         
         $conn->beginTransaction();
         
@@ -17,6 +18,7 @@ if(isset($_POST['registrar_mov'])){
         
         $conn->commit();
         header("Location: movimientos.php?msg=registrado");
+        exit;
     } catch(Exception $e) {
         $conn->rollBack();
         echo "Error: " . $e->getMessage();
@@ -28,6 +30,17 @@ if(isset($_POST['recalcular'])){
     $stmt = $conn->prepare("CALL sp_recalcular_stock_prenda(?)");
     $stmt->execute([$_POST['id_prenda']]);
     header("Location: movimientos.php?msg=recalculado");
+    exit;
+}
+
+// Eliminar movimiento (actúa el trigger trg_actualizar_stock_delete)
+if(isset($_POST['eliminar_mov'])){
+    $stmtUser = $conn->prepare("SET @usuario_app = ?");
+    $stmtUser->execute([$_SESSION['usuario']]);
+    $stmt = $conn->prepare("DELETE FROM movimiento_stock WHERE id_movimiento = ?");
+    $stmt->execute([$_POST['id_movimiento']]);
+    header("Location: movimientos.php?msg=eliminado");
+    exit;
 }
 ?>
 <!DOCTYPE html>
@@ -48,7 +61,7 @@ if(isset($_POST['recalcular'])){
                     <label>Prenda</label>
                     <select name="prenda" class="form-select">
                         <?php $ps = $conn->query("SELECT id_prenda, nombre FROM prenda"); 
-                              while($p = $ps->fetch()) echo "<option value='{$p['id_prenda']}'>{$p['nombre']}</option>"; ?>
+                              while($p = $ps->fetch()) echo "<option value='".htmlspecialchars($p['id_prenda'])."'>".htmlspecialchars($p['nombre'])."</option>"; ?>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -67,7 +80,7 @@ if(isset($_POST['recalcular'])){
                     <label>Empleado que autoriza</label>
                     <select name="emp" class="form-select">
                         <?php $es = $conn->query("SELECT id_empleado, nombre FROM empleado"); 
-                              while($e = $es->fetch()) echo "<option value='{$e['id_empleado']}'>{$e['nombre']}</option>"; ?>
+                              while($e = $es->fetch()) echo "<option value='".htmlspecialchars($e['id_empleado'])."'>".htmlspecialchars($e['nombre'])."</option>"; ?>
                     </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
@@ -80,7 +93,7 @@ if(isset($_POST['recalcular'])){
 
         <div class="card card-custom">
             <table class="table table-striped mb-0">
-                <thead class="table-dark">
+                <thead>
                     <tr><th>Fecha</th><th>Prenda</th><th>Tipo</th><th>Cant.</th><th>Empleado</th><th>Acciones</th></tr>
                 </thead>
                 <tbody>
@@ -92,14 +105,18 @@ if(isset($_POST['recalcular'])){
                     while($row = $res->fetch()){
                         $clase = ($row['tipo_movimiento'] == 'entrada') ? 'text-success' : 'text-danger';
                         echo "<tr>
-                                <td>{$row['fecha']}</td>
-                                <td>{$row['p_nom']}</td>
-                                <td class='fw-bold $clase'>".strtoupper($row['tipo_movimiento'])."</td>
-                                <td>{$row['cantidad']}</td>
-                                <td>{$row['e_nom']}</td>
+                                <td>".htmlspecialchars($row['fecha'])."</td>
+                                <td>".htmlspecialchars($row['p_nom'])."</td>
+                                <td class='fw-bold $clase'>".strtoupper(htmlspecialchars($row['tipo_movimiento']))."</td>
+                                <td>".htmlspecialchars($row['cantidad'])."</td>
+                                <td>".htmlspecialchars($row['e_nom'])."</td>
                                 <td>
                                     <form method='POST' style='display:inline'>
-                                        <input type='hidden' name='id_prenda' value='{$row['id_prenda']}'>
+                                        <input type='hidden' name='id_movimiento' value='".htmlspecialchars($row['id_movimiento'])."'>
+                                        <button type='submit' name='eliminar_mov' class='btn btn-sm btn-danger' onclick=\"return confirm('¿Eliminar este movimiento? Esto revertirá el stock automáticamente.')\">🗑️</button>
+                                    </form>
+                                    <form method='POST' style='display:inline'>
+                                        <input type='hidden' name='id_prenda' value='".htmlspecialchars($row['id_prenda'])."'>
                                         <button type='submit' name='recalcular' class='btn btn-sm btn-info' onclick=\"return confirm('Recalcular stock desde movimientos?')\">🔄</button>
                                     </form>
                                 </td>
