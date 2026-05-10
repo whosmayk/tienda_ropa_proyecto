@@ -99,6 +99,17 @@
 
 ---
 
+### 2.4 Rollback (Demostración de Transacción Revertida)
+| | Descripción |
+| --- | --- |
+| **Qué hace** | Cuando una operación dentro de la transacción falla, el `catch` ejecuta `rollBack()` y revierte todos los cambios |
+| **Error típico** | Violación de FK: Foreign Key constraint (`fk_mov_emp`) impide insertar si el `id_empleado` no existe |
+| **Ubicación en código** | `movimientos.php` líneas 13-25: el bloque `catch` ejecuta `$conn->rollBack()` |
+| **Cómo forzar el rollback** | Ver sección 7.1 "Demostrar Rollback con FK" |
+| **Resultado visual** | `Error: SQLSTATE[23000]: Integrity constraint violation: 1452...` — ningún dato se guarda |
+
+---
+
 ## 3. Triggers (Automáticos)
 
 ### 3.1 trg_prenda_insert
@@ -202,6 +213,7 @@
 | TRANSACCIÓN movimientos | movimientos.php | Al registrar (13-23) |
 | TRANSACCIÓN precio | actualizaciones.php | Al actualizar (12-21) |
 | TRANSACCIÓN editar prenda | editar.php | Al guardar cambios (23-43) |
+| **ROLLBACK (FK)** | **movimientos.php** | **Sección 7.1** |
 | Trigger stock | automático | DB MySQL |
 | Trigger bitácora | automático | DB MySQL |
 | **_BITÁCORA** | **bitacora.php** | **Menú Historial y Stock** |
@@ -216,6 +228,30 @@
 4. **Recalcular stock** → Ir a Inventario > clic 🔄 > verificar stock
 5. **Editar prenda** → Ir a Inventario > clic "Editar" > cambiar precio o datos > guardar > verificar en tabla actualizacion
 6. **Ver bitácora** → Ir a Historial y Stock > Bitácora (solo Administrador)
+7. **Rollback (demostración de transacción)** → Véase sección 7.1
+
+### 7.1 Demostrar Rollback con FK
+
+El rollback se demuestra forzando un error de Foreign Key que activa el `catch`:
+
+1. Abrir `movimientos.php` → anotar un empleado visible en el dropdown (anotar su `id_empleado`)
+2. Ir a **phpMyAdmin** → tabla `empleado` → eliminar ese empleado
+3. **NO refrescar** la página de `movimientos.php` (el HTML del dropdown sigue mostrando el empleado eliminado)
+4. En `movimientos.php` → seleccionar ese empleado eliminado > Registrar movimiento
+5. El `INSERT INTO movimiento_stock` falla → MySQL lanza exception de FK constraint
+6. El `catch` ejecuta `$conn->rollBack()` → revierte la transacción
+7. Se muestra el error en pantalla:
+
+```
+Error: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row:
+a foreign key constraint fails (`tienda_ropa_test`.`movimiento_stock`,
+CONSTRAINT `fk_mov_emp` FOREIGN KEY (`id_empleado`) REFERENCES `empleado`)
+```
+
+8. **Resultado**: Ningún dato se insertó. La transacción se revirtió completamente.
+9. Recuperação: Volver a phpMyAdmin y reinsertar el empleado eliminado
+
+**Nota**: Funciona también en `actualizaciones.php` y `editar.php` con el mismo método.
 
 ---
 
