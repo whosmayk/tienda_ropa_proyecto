@@ -16,11 +16,8 @@
 ### 1.2 sp_movimientos_por_prenda
 | | Descripción |
 | --- | --- |
-| **Qué hace** | Lista los movimientos de inventario de una prenda específica |
-| **Página UI** | `movimientos.php` |
-| **Dónde en la página** | Tabla de Movimientos (se muestra automáticamente al cargar la página) |
-| **Ubicación en código** | `movimientos.php` línea 68: Query que muestra todos los movimientos con JOIN |
-| **Verificación** | Ver en tabla `movimiento_stock` |
+| **Nota** | No existe como procedure. La consulta usa `SELECT` con `JOIN` (`vw_movimientos_stock`) directamente en `movimientos.php` |
+| **Ubicación en código** | `movimientos.php` línea 30: Query con `JOIN` a `prenda` y `empleado` (no es `CALL`) |
 
 ---
 
@@ -30,7 +27,7 @@
 | **Qué hace** | Actualiza el precio de una prenda Y registra en historial `actualizacion` |
 | **Página UI** | `actualizaciones.php` |
 | **Dónde en la página** | Formulario "Cambiar Precio de Prenda" > seleccionar Prenda > colocar Nuevo Precio > clic botón "Actualizar" |
-| **Ubicación en código** | `actualizaciones.php` líneas 16-19: `$stmt = $conn->prepare("CALL actualizar_precio_prenda(?, ?, ?)");` |
+| **Ubicación en código** | `actualizaciones.php` líneas 14-16: `$stmt = $conn->prepare("CALL actualizar_precio_prenda(?, ?, ?, ?)");` (4 parámetros: id_prenda, nuevo_precio, id_empleado, usuario) |
 | **Verificación** | Ver en tablas `prenda` (precio nuevo) y `actualizacion` (historial) |
 
 ---
@@ -72,7 +69,7 @@
 | **Qué hace** | Asegura que el precio se actualice Y se registre en historial |
 | **Página UI** | `actualizaciones.php` |
 | **Dónde en la página** | Al actualizar precio de una prenda |
-| **Ubicación en código** | `actualizaciones.php` líneas 14-21: |
+| **Ubicación en código** | `actualizaciones.php` líneas 12-21: |
 | | ```php |
 | | $conn->beginTransaction(); |
 | | $stmt = $conn->prepare("CALL actualizar_precio_prenda..."); |
@@ -80,6 +77,25 @@
 | | $conn->commit(); |
 | | ``` |
 | **Verificación** | Ver en tablas `prenda` y `actualizacion` |
+
+---
+
+### 2.3 Transacción en Editar Prenda
+| | Descripción |
+| --- | --- |
+| **Qué hace** | Asegura que el UPDATE de prenda y el INSERT de historial de precio se ejecuten de forma atómica |
+| **Página UI** | `editar.php` |
+| **Dónde en la página** | Al guardar cambios en una prenda |
+| **Ubicación en código** | `editar.php` líneas 23-43: |
+| | ```php |
+| | $conn->beginTransaction(); |
+| | $stmt = $conn->prepare("INSERT INTO actualizacion..."); |
+| | $stmt->execute([...]); |
+| | $stmt = $conn->prepare("UPDATE prenda SET..."); |
+| | $stmt->execute([...]); |
+| | $conn->commit(); |
+| | ``` |
+| **Verificación** | Ver tablas `prenda` (datos actualizados) y `actualizacion` (historial de precio) |
 
 ---
 
@@ -119,7 +135,7 @@
 | | Descripción |
 | --- | --- |
 | **Qué hace** | Registra en bitácora cuando cambia el precio de una prenda |
-| **Cuándo se ejecuta** | Al actualizar precio en `actualizaciones.php` |
+| **Cuándo se ejecuta** | Al actualizar precio en `actualizaciones.php` o al editar prenda en `editar.php` |
 | **Ubicación en código** | En la base de datos MySQL |
 | **Verificación** | Ver en tabla `bitacora_sistema` |
 
@@ -179,15 +195,15 @@
 
 | Elemento | Página | Ubicación UI | Código (línea) |
 | --- | --- | --- | --- |
-| `sp_categoria_nueva` | categorias.php | Formulario Nueva Categoría (8-11) |
-| `sp_movimientos_por_prenda` | movimientos.php | Tabla de movimientos (68) |
-| `actualizar_precio_prenda` | actualizaciones.php | Formulario cambiar precio (16-19) |
-| `sp_recalcular_stock_prenda` | index.php | Botón 🔄 en tabla (6-8) |
-| TRANSACCIÓN movimientos | movimientos.php | Al registrar (10-24) |
-| TRANSACCIÓN precio | actualizaciones.php | Al actualizar (14-21) |
+| `sp_categoria_nueva` | categorias.php | Formulario Nueva Categoría (9) |
+| Vista movimientos | movimientos.php | Tabla de movimientos (JOIN) |
+| `actualizar_precio_prenda` | actualizaciones.php | Formulario cambiar precio (15) |
+| `sp_recalcular_stock_prenda` | index.php | Botón 🔄 en tabla (8) |
+| TRANSACCIÓN movimientos | movimientos.php | Al registrar (13-23) |
+| TRANSACCIÓN precio | actualizaciones.php | Al actualizar (12-21) |
+| TRANSACCIÓN editar prenda | editar.php | Al guardar cambios (23-43) |
 | Trigger stock | automático | DB MySQL |
 | Trigger bitácora | automático | DB MySQL |
-| Eliminar categoría | categorias.php | Botón "Eliminar" en tabla |
 | **_BITÁCORA** | **bitacora.php** | **Menú Historial y Stock** |
 
 ---
@@ -198,7 +214,8 @@
 2. **Movimiento stock** → Ir a Movimientos > registrar entrada > verificar stock en Inventario
 3. **Cambio precio** → Ir a Historial Precios > cambiar precio > verificar en tabla actualizacion
 4. **Recalcular stock** → Ir a Inventario > clic 🔄 > verificar stock
-5. **Ver bitácora** → Ir a Historial y Stock > Bitácora (solo Administrador)
+5. **Editar prenda** → Ir a Inventario > clic "Editar" > cambiar precio o datos > guardar > verificar en tabla actualizacion
+6. **Ver bitácora** → Ir a Historial y Stock > Bitácora (solo Administrador)
 
 ---
 
