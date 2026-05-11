@@ -6,7 +6,7 @@ include 'db.php';
 // Usando TRANSACCIÓN + SP
 if(isset($_POST['registrar_mov'])){
     try {
-        // Establecer variable de usuario para el trigger (usando prepared statement)
+        // Establecer variable de usuario para el trigger
         $stmtUser = $conn->prepare("SET @usuario_app = ?");
         $stmtUser->execute([$_SESSION['usuario']]);
         
@@ -33,7 +33,7 @@ if(isset($_POST['recalcular'])){
     exit;
 }
 
-// Eliminar movimiento (actúa el trigger trg_actualizar_stock_delete)
+// Eliminar movimiento (trg_actualizar_stock_delete)
 if(isset($_POST['eliminar_mov'])){
     $stmtUser = $conn->prepare("SET @usuario_app = ?");
     $stmtUser->execute([$_SESSION['usuario']]);

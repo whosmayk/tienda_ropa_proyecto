@@ -6,12 +6,12 @@ include 'db.php';
 // Usar SP para actualizar precio con transacción
 if(isset($_POST['actualizar_precio'])){
     try {
-        // Establecer variable de usuario para el trigger
+        // Establecer variable de usuario
         $conn->query("SET @usuario_app = '".$_SESSION['usuario']."'");
         
         $conn->beginTransaction();
         
-        // SP: Actualizar precio y registrar en historial (ahora con usuario)
+        // SP: Actualizar precio y registrar en historial
         $stmt = $conn->prepare("CALL actualizar_precio_prenda(?, ?, ?, ?)");
         $stmt->execute([$_POST['id_prenda'], $_POST['nuevo_precio'], $_POST['id_empleado'], $_SESSION['usuario']]);
         

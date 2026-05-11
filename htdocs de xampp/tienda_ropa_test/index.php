@@ -59,7 +59,6 @@ function getHeaderLink($col_key, $label, $current_sort, $current_order, $current
             <!-- Formulario de Búsqueda -->
             <div class="col-md-5">
                 <form method="GET" class="d-flex">
-                    <!-- Mantenemos el orden actual oculto para no perderlo al buscar -->
                     <input type="hidden" name="sort" value="<?= $sort ?>">
                     <input type="hidden" name="order" value="<?= $order ?>">
                     
@@ -105,7 +104,7 @@ function getHeaderLink($col_key, $label, $current_sort, $current_order, $current
                             JOIN talla t ON p.id_talla = t.id_talla
                             JOIN color col ON p.id_color = col.id_color";
 
-                    // Si hay búsqueda, añadimos las condiciones
+                    // Condiciones
                     if (!empty($search)) {
                         $sql .= " WHERE p.nombre LIKE :busqueda 
                                   OR c.nombre LIKE :busqueda 

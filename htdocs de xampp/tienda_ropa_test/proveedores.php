@@ -35,7 +35,7 @@ if(isset($_GET['delete'])){
         $stmt->execute([$_GET['delete']]);
         header("Location: proveedores.php?msg=eliminado");
     } catch (Exception $e) {
-        // Error común: El proveedor tiene registros asociados en la tabla 'registro'
+        // El proveedor tiene registros asociados en la tabla registro
         $error = "No se puede eliminar este proveedor porque tiene registros de mercancía asociados.";
     }
 }

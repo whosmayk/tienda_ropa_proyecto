@@ -1,8 +1,8 @@
 <?php
 $host = "localhost";
 $db_name = "tienda_ropa_test";
-$username = "root"; // Usuario por defecto en phpMyAdmin
-$password = "";     // Contraseña por defecto vacía en XAMPP
+$username = "root";
+$password = "";
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8", $username, $password);

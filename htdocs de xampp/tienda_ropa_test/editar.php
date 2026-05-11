@@ -17,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $conn->query("SET @usuario_app = '".$_SESSION['usuario']."'");
     $nuevo_precio = $_POST['precio'];
     $precio_anterior = $prenda['precio'];
-    $id_empleado = $_POST['id_empleado']; // Necesitamos saber quién edita
+    $id_empleado = $_POST['id_empleado'];
 
     try {
-        $conn->beginTransaction(); // Iniciamos una transacción para seguridad
+        $conn->beginTransaction(); // Transacción
 
-        // 2. Si el precio cambió, insertamos en la tabla 'actualizacion'
+        // 2. Si el precio cambió, insertamos en la tabla actualizacion
         if ($nuevo_precio != $precio_anterior) {
             $sql_act = "INSERT INTO actualizacion (precio_anterior, precio_nuevo, id_prenda, id_empleado) 
                         VALUES (?, ?, ?, ?)";
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $conn->commit(); // Guardamos todos los cambios
         header("Location: index.php");
     } catch (Exception $e) {
-        $conn->rollBack(); // Si algo falla, cancelamos todo
+        $conn->rollBack();
         echo "Error: " . $e->getMessage();
     }
 }

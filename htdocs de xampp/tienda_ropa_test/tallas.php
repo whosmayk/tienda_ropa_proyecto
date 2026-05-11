@@ -3,11 +3,11 @@ include 'check_auth.php';
 include 'permisos.php';
 include 'db.php'; 
 
-// 1. Lógica para INSERTAR (El ID se asigna solo por ser AUTO_INCREMENT)
+// 1. Lógica para INSERTAR
 if(isset($_POST['add'])){
     $conn->query("SET @usuario_app = '".$_SESSION['usuario']."'");
     $stmt = $conn->prepare("INSERT INTO talla (talla) VALUES (?)");
-    $stmt->execute([$_POST['talla']]);  // Fixed extra bracket
+    $stmt->execute([$_POST['talla']]);
     header("Location: tallas.php?msg=creado");
     exit;
 }
@@ -21,7 +21,7 @@ if(isset($_POST['update'])){
     exit;
 }
 
-// 3. Lógica para ELIMINAR (cambiado a POST)
+// 3. Lógica para ELIMINAR
 if(isset($_POST['delete'])){
     try {
         $conn->query("SET @usuario_app = '".$_SESSION['usuario']."'");

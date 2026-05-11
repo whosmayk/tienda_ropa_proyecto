@@ -9,7 +9,7 @@ if (!puede_gestionar_empleados()) {
 
 include 'db.php'; 
 
-// 1. Lógica para INSERTAR (Nuevo Empleado)
+// 1. Lógica para INSERTAR
 if(isset($_POST['add'])){
     $stmtUser = $conn->prepare("SET @usuario_app = ?");
     $stmtUser->execute([$_SESSION['usuario']]);
@@ -19,7 +19,7 @@ if(isset($_POST['add'])){
     exit;
 }
 
-// 2. Lógica para ACTUALIZAR (Modificar Empleado existente)
+// 2. Lógica para ACTUALIZAR
 if(isset($_POST['update'])){
     $stmtUser = $conn->prepare("SET @usuario_app = ?");
     $stmtUser->execute([$_SESSION['usuario']]);
@@ -61,7 +61,6 @@ if(isset($_GET['delete'])){
         </div>
         <?php endif; ?>
         <div class="row">
-            <!-- Formulario Lateral para registro rápido -->
             <div class="col-md-4 mb-4">
                 <div class="card card-custom">
                     <div class="card-header card-header-custom">Registrar Nuevo Empleado</div>

@@ -107,7 +107,6 @@ if(isset($_POST['registrar_recepcion'])){
                                 <?php
                                 $provs = $conn->query("SELECT id_proveedor, nombre FROM proveedor");
                                 while($pr = $provs->fetch()) {
-                                    // CORRECCIÓN AQUÍ: Antes decía $row, debe decir $pr
                                     echo "<option value='{$pr['id_proveedor']}'>{$pr['nombre']}</option>";
                                 }
                                 ?>
